@@ -61,3 +61,7 @@ Kendi hesabınıza taşırken `olcayto-akbudak` alanını değiştirin. Hesap bi
 ## Depo yerleşimi
 
 GitHub sürümü dosyaları depo kökünde tutar; `app.py` alan motorunu ve CLI girişini içerir. `test_core.py` doğrudan bu modülü test eder. Belgeler ve örnek veriler aynı kökte yer alır.
+
+## Bağlantı yaşam döngüsü
+
+SQLite transaction context bağlantıyı kendi başına kapatmaz. `sqlite_session` başarıda commit, hatada rollback yapar ve her durumda dosya tanıtıcısını kapatır. Test başlangıcında kapanan bağlantıya erişimin `ProgrammingError` verdiği kontrol edilir; geçici dosyalar Windows üzerinde kilitli kalmaz.

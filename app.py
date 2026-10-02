@@ -6,6 +6,17 @@ Invariant: Zincir anahtarı ve güvenilir checkpoint veritabanından bağımsız
 Boundary: Yerel SQLite değiştirilemez kayıt deposu değildir; demo anahtarı üretimde kullanılmamalıdır."""
 import hashlib, hmac, json, sqlite3, tempfile
 from pathlib import Path
+from contextlib import contextmanager
+
+@contextmanager
+def sqlite_session(path, **kwargs):
+    """Commit or roll back, then always close the OS file handle."""
+    connection = sqlite3.connect(path, **kwargs)
+    try:
+        with connection:
+            yield connection
+    finally:
+        connection.close()
 ALLOWED = {'NEW': {'SEND': 'SENDING'}, 'SENDING': {'ACK': 'ACCEPTED', 'TIMEOUT': 'UNKNOWN', 'REJECT': 'REJECTED'}, 'UNKNOWN': {'RECONCILE': 'ACCEPTED'}, 'ACCEPTED': {}, 'REJECTED': {}}
 
 def canonical(value):
@@ -18,14 +29,14 @@ class EventLedger:
             raise ValueError('key must be at least 16 bytes')
         self.path = str(path)
         self.key = key
-        with sqlite3.connect(self.path) as db:
+        with sqlite_session(self.path) as db:
             db.executescript('CREATE TABLE IF NOT EXISTS events(seq INTEGER PRIMARY KEY,event_id TEXT UNIQUE,entity TEXT,kind TEXT,payload TEXT,prev TEXT,digest TEXT);\n          CREATE TABLE IF NOT EXISTS projection(entity TEXT PRIMARY KEY,state TEXT,seq INTEGER);')
 
     def _signature(self, seq, event_id, entity, kind, payload, previous):
         return hmac.new(self.key, canonical([seq, event_id, entity, kind, payload, previous]).encode(), hashlib.sha256).hexdigest()
 
     def append(self, event_id, entity, kind, payload):
-        with sqlite3.connect(self.path) as db:
+        with sqlite_session(self.path) as db:
             db.execute('BEGIN IMMEDIATE')
             existing = db.execute('SELECT entity,kind,payload,seq FROM events WHERE event_id=?', (event_id,)).fetchone()
             body = canonical(payload)
@@ -49,7 +60,7 @@ class EventLedger:
         previous = 'GENESIS'
         states = {}
         expected = 1
-        with sqlite3.connect(self.path) as db:
+        with sqlite_session(self.path) as db:
             for seq, eid, entity, kind, payload, prev, digest in db.execute('SELECT * FROM events ORDER BY seq'):
                 if seq != expected or prev != previous:
                     raise ValueError('broken event sequence')
@@ -74,10 +85,8 @@ def run(config):
         report = ledger.replay()
         report['scope'] = 'Integrity verification needs an externally trusted checkpoint; local storage is not immutable.'
         return report
-
 import argparse, json
 from pathlib import Path
-
 
 def main():
     parser = argparse.ArgumentParser(description='Run reproducible synthetic project scenario')
