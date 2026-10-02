@@ -1,0 +1,19 @@
+{
+  "events": [
+    {
+      "id": "E1",
+      "entity": "I1",
+      "kind": "SEND"
+    },
+    {
+      "id": "E2",
+      "entity": "I1",
+      "kind": "TIMEOUT"
+    },
+    {
+      "id": "E3",
+      "entity": "I1",
+      "kind": "RECONCILE"
+    }
+  ]
+}

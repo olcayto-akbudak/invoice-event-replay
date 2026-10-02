@@ -1,0 +1,10 @@
+{
+  "states": {
+    "I1": "ACCEPTED"
+  },
+  "checkpoint": {
+    "seq": 3,
+    "digest": "c761b2b3a0316e059f24b7cb1bde39214fd5e2a5a34dbc7ca648be476cd36635"
+  },
+  "scope": "Integrity verification needs an externally trusted checkpoint; local storage is not immutable."
+}

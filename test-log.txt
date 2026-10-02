@@ -1,0 +1,13 @@
+test_conflict (test_core.CoreTests.test_conflict) ... ok
+test_idempotency (test_core.CoreTests.test_idempotency) ... ok
+test_illegal (test_core.CoreTests.test_illegal) ... ok
+test_projection_ignored_in_replay (test_core.CoreTests.test_projection_ignored_in_replay) ... ok
+test_short_key (test_core.CoreTests.test_short_key) ... ok
+test_tail_checkpoint (test_core.CoreTests.test_tail_checkpoint) ... ok
+test_tamper (test_core.CoreTests.test_tamper) ... ok
+test_transition (test_core.CoreTests.test_transition) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.019s
+
+OK

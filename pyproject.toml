@@ -1,0 +1,7 @@
+[project]
+name = "invoice-event-replay"
+version = "0.1.0"
+description = "Fatura Olay Kaydı ve Replay"
+requires-python = ">=3.12"
+[tool.ruff]
+line-length = 120
